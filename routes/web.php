@@ -14,3 +14,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::resource('lista','FacturaController');
+Route::get('buscar', 'FacturaController@index');
