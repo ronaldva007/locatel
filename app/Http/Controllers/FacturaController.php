@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Factura;
 use App\Proveedor;
+use App\Archivo;
 
 class FacturaController extends Controller
 {
@@ -20,13 +21,17 @@ class FacturaController extends Controller
 
         if ($search=='') {
             $sales = Factura::join('proveedors', 'facturas.cod_pro', '=', 'proveedors.id')
-            ->select('facturas.id', 'facturas.factura', 'facturas.f_ingreso', 'facturas.orden_compra', 'facturas.migo', 'facturas.status', 'proveedors.nombre')
-            ->orderBy('facturas.id', 'desc')->paginate(200);
+            ->join('archivos', 'facturas.id','=','archivos.name')
+            ->select('facturas.id', 'facturas.factura', 'facturas.f_ingreso', 'facturas.orden_compra', 'facturas.migo', 'facturas.carta', 'facturas.status', 'proveedors.nombre','archivos.name')
+            ->orderBy('facturas.id', 'desc')->get();
         } else {
              $sales = Factura::join('proveedors', 'facturas.cod_pro', '=', 'proveedors.id')
-            ->select('facturas.id', 'facturas.factura', 'facturas.f_ingreso', 'facturas.orden_compra', 'facturas.migo', 'facturas.status', 'proveedors.nombre')
-            ->where('facturas.'.$criterion, 'like', '%'. $search . '%')->orderBy('facturas.id', 'desc')->paginate(10);
+              ->join('archivos', 'facturas.id','=','archivos.name')
+            ->select('facturas.id', 'facturas.factura', 'facturas.f_ingreso', 'facturas.orden_compra', 'facturas.migo', 'facturas.status', 'proveedors.nombre', 'facturas.carta','archivos.name')
+            ->where('facturas.'.$criterion, 'like', '%'. $search . '%')->orderBy('facturas.id', 'desc')->get();
         }
+
+        $facs = Archivo::select('archivos.name')->get();
 
         $long = count($sales);
         for($i=0; $i<$long; $i++){
@@ -43,7 +48,7 @@ class FacturaController extends Controller
           }
       }
       
- // dd($sales);
+   dd($long);
         // return [
         //        'pagination' => [
         //         'total'         => $sales->total(),
@@ -55,7 +60,7 @@ class FacturaController extends Controller
         //     ],
         //     'sales' => $sales,'deuda' => $total
         // ];
-        return view('facturas.lista',compact('sales'));
+        return view('facturas.lista',compact('sales','long'));
     }
 
 
